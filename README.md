@@ -10,6 +10,12 @@ Aplicação Next.js que copia os arquivos de uma pasta do Google Drive para um c
 
 URL publicada: https://drive-to-blob-p2.onrender.com (Render, plano gratuito: a primeira requisição após inatividade demora ~1 min).
 
+## Situação da entrega
+
+- **Verificado de verdade:** Azure com a BlobSASURL do enunciado (criar contêiner, enviar, listar, apagar), interface, build, teste, typecheck, lint e container (inclusive build a partir de clone limpo).
+- **Não verificado:** a leitura do Google Drive só passou no typecheck, sem rodar contra uma pasta real.
+- **Instância publicada:** tem só as variáveis do Azure. Sem `GOOGLE_API_KEY` e `GOOGLE_DRIVE_FOLDER_ID`, "Listar destino" funciona e "Listar origem"/"Migrar" respondem qual variável falta. Para ativar, siga a seção abaixo e adicione as duas variáveis no painel do Render.
+
 ## Configuração do Google (uma vez)
 
 **Opção A: pasta pública + chave de API (mais simples)**
