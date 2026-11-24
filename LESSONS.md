@@ -37,3 +37,8 @@
 - **Evidência:** `git ls-files public` retornava 0 arquivos; o `Dockerfile` faz `COPY --from=builder /app/public ./public`. O build local passava só porque a pasta vazia existia no disco.
 - **Onde:** `public/.gitkeep`, `Dockerfile`.
 - **Solução:** versionar `public/.gitkeep` e validar com um clone limpo do repositório + `podman build`.
+
+## 9. "Listar destino" falhava em produção por exigir variáveis do Google
+- **Evidência:** `curl https://drive-to-blob-p2.onrender.com/api/destination` retornou `Variável de ambiente ausente: GOOGLE_DRIVE_FOLDER_ID`. Localmente passava porque o `.env.local` tinha placeholders.
+- **Onde:** `lib/env.ts` exigia `GOOGLE_DRIVE_FOLDER_ID` em qualquer chamada; `lib/drive.ts` (`listSourceFiles`).
+- **Solução:** a exigência passou a valer só no lado do Drive; Azure e Google falham de forma independente.

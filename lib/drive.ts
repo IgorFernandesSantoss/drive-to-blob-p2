@@ -41,12 +41,14 @@ export const destinationName = (file: SourceFile) =>
 
 // shortcut: só o primeiro nível da pasta (sem subpastas), subir para recursivo se for exigido.
 export const listSourceFiles = async (): Promise<SourceFile[]> => {
+  const folderId = env().driveFolderId;
+  if (!folderId) throw new Error("Defina GOOGLE_DRIVE_FOLDER_ID (ID da pasta do Drive).");
   const drv = client();
   const files: SourceFile[] = [];
   let pageToken: string | undefined;
   do {
     const { data } = await drv.files.list({
-      q: `'${env().driveFolderId}' in parents and trashed = false`,
+      q: `'${folderId}' in parents and trashed = false`,
       fields: "nextPageToken, files(id, name, mimeType, size)",
       pageSize: 100,
       pageToken,
