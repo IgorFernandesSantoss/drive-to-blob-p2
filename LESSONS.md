@@ -27,3 +27,8 @@
 - **Evidência:** `/api/source` com chave inválida retornava `Unexpected token 'D'...`.
 - **Onde:** `lib/drive.ts` (`parseCredentials`).
 - **Solução:** mensagem clara pedindo JSON ou base64.
+
+## 7. Enunciado já traz as credenciais do Azure; só o Google exigia setup
+- **Evidência:** o `gcloud` local só tinha a conta corporativa (sessão expirada), e a prova entrega Connection String e BlobSASURL do Azure.
+- **Onde:** `lib/blob.ts` (SAS URL ou Connection String), `lib/drive.ts` (chave de API ou Service Account).
+- **Solução:** usar as credenciais do Word (SAS testada com criar/enviar/listar/apagar) e permitir chave de API para a pasta pública do Drive, sem criar nada na conta corporativa.

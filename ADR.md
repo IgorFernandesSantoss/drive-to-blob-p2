@@ -6,7 +6,7 @@
 - **Consequência:** reaproveita Dockerfile e fluxo de deploy do P1.
 
 ## ADR-002: Autenticação
-- **Google:** Service Account com escopo `drive.readonly`; a pasta é compartilhada com o e-mail dela. Sem OAuth de usuário, sem senha. A chave vem de `GOOGLE_SERVICE_ACCOUNT_JSON` (JSON ou base64).
+- **Google:** dois modos. (1) `GOOGLE_API_KEY` com pasta pública "qualquer pessoa com o link", escolhido pelo aluno por ser o mais simples (sem Service Account); (2) Service Account com escopo `drive.readonly` em `GOOGLE_SERVICE_ACCOUNT_JSON` (JSON ou base64), para pasta privada. Sem OAuth de usuário. A chave de API tem prioridade.
 - **Azure:** BlobSASURL do enunciado em `AZURE_BLOB_SAS_URL` (preferida: SAS tem validade e permissões limitadas, não expõe a chave da conta) ou Connection String em `AZURE_STORAGE_CONNECTION_STRING`. Testado com a SAS: criar contêiner, enviar, listar e apagar funcionam.
 - **Segredos:** só em variáveis de ambiente; nunca no git nem no zip.
 

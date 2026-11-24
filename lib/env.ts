@@ -6,8 +6,10 @@ const required = (name: string) => {
 
 // Lido sob demanda (não no import) para o `next build` funcionar sem segredos.
 export const env = () => ({
-  // JSON puro ou base64 do JSON da Service Account (base64 facilita colar no painel do Render).
-  googleServiceAccountJson: required("GOOGLE_SERVICE_ACCOUNT_JSON"),
+  // Google: chave de API (pasta pública, "qualquer pessoa com o link") OU Service Account
+  // (JSON puro ou base64 dele; base64 facilita colar no painel do Render).
+  googleApiKey: process.env.GOOGLE_API_KEY,
+  googleServiceAccountJson: process.env.GOOGLE_SERVICE_ACCOUNT_JSON,
   driveFolderId: required("GOOGLE_DRIVE_FOLDER_ID"),
   // Azure: BlobSASURL (preferida, permissão limitada e com validade) ou Connection String, ambas do enunciado.
   azureSasUrl: process.env.AZURE_BLOB_SAS_URL,

@@ -2,7 +2,7 @@
 
 Aplicação Next.js que copia os arquivos de uma pasta do Google Drive para um contêiner do Azure Blob Storage.
 
-- **Origem:** Google Drive, autenticação por Service Account (`lib/drive.ts`, `listSourceFiles`).
+- **Origem:** Google Drive, autenticação por chave de API (pasta pública) ou Service Account (`lib/drive.ts`, `listSourceFiles`).
 - **Destino:** Azure Blob Storage, autenticação por BlobSASURL (preferida) ou Connection String, ambas fornecidas no Word da prova (`lib/blob.ts`, `listDestinationBlobs`).
 - **Migração:** `lib/migrate.ts` imprime `[OK]` ou `[ERRO]` no console para cada arquivo; um erro não interrompe os demais.
 - **Interface:** botões "Listar origem (Drive)", "Listar destino (Blob)" e "Migrar", com tabela de status por arquivo.
@@ -12,20 +12,19 @@ URL publicada: _preencher após o deploy no Render_ (ver seção Publicação).
 
 ## Configuração do Google (uma vez)
 
-1. No Google Cloud Console (conta pessoal), crie um projeto e ative a **Google Drive API**.
-2. Em IAM > Contas de serviço, crie uma Service Account e gere uma **chave JSON**.
-3. No Google Drive, crie a pasta, coloque arquivos e **compartilhe como Leitor** com o e-mail da Service Account (`...@...iam.gserviceaccount.com`).
-4. O ID da pasta é o trecho final da URL (`drive.google.com/drive/folders/<ID>`).
+**Opção A: pasta pública + chave de API (mais simples)**
 
-Via `gcloud` (logado na conta pessoal):
+1. No Google Drive, compartilhe a pasta como "Qualquer pessoa com o link" (Leitor). O ID da pasta é o final da URL (`drive.google.com/drive/folders/<ID>`).
+2. No Google Cloud Console: crie um projeto, ative a **Google Drive API** e em APIs e serviços > Credenciais crie uma **Chave de API** (restrinja à Drive API).
+3. Defina `GOOGLE_API_KEY` e `GOOGLE_DRIVE_FOLDER_ID`.
 
-```bash
-gcloud projects create <id-do-projeto>
-gcloud services enable drive.googleapis.com --project <id-do-projeto>
-gcloud iam service-accounts create p2-drive-reader --project <id-do-projeto>
-gcloud iam service-accounts keys create ~/p2-key.json \
-  --iam-account p2-drive-reader@<id-do-projeto>.iam.gserviceaccount.com
-```
+**Opção B: Service Account (pasta privada)**
+
+1. Crie uma Service Account com chave JSON (IAM > Contas de serviço) e ative a Drive API.
+2. Compartilhe a pasta como Leitor com o e-mail da Service Account.
+3. Defina `GOOGLE_SERVICE_ACCOUNT_JSON` (JSON ou base64: `base64 -w0 chave.json`) e `GOOGLE_DRIVE_FOLDER_ID`.
+
+Se as duas estiverem definidas, a chave de API tem prioridade.
 
 ## Rodar local
 
@@ -36,7 +35,6 @@ bun dev                      # http://localhost:3000
 bun test && bun run typecheck && bun run lint
 ```
 
-Para `GOOGLE_SERVICE_ACCOUNT_JSON` use o JSON da chave ou o base64 dele (`base64 -w0 ~/p2-key.json`).
 O contêiner padrão é `aluno-igorfernandes` (`Aluno_xxx` do enunciado não é um nome válido no Azure; ver `ADR.md`).
 
 ## Container
@@ -48,7 +46,7 @@ podman run --rm -p 10000:10000 --env-file .env.local p2-drive-blob
 
 ## Publicação (Render)
 
-New > Web Service > repositório `IgorFernandesSantoss/drive-to-blob-p2` > Runtime **Docker** > defina as variáveis de ambiente (`GOOGLE_*` e `AZURE_BLOB_SAS_URL`).
+New > Web Service > repositório `IgorFernandesSantoss/drive-to-blob-p2` > Runtime **Docker** > defina as variáveis de ambiente (`GOOGLE_API_KEY`, `GOOGLE_DRIVE_FOLDER_ID` e `AZURE_BLOB_SAS_URL`).
 O Render injeta `PORT`; o `Dockerfile` usa 10000 por padrão.
 
 ## Segurança

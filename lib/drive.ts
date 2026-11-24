@@ -17,15 +17,21 @@ const parseCredentials = (raw: string) => {
   }
 };
 
-// Service Account: nenhuma senha de usuário, só a chave JSON + pasta compartilhada com o e-mail dela.
-const client = () =>
-  drive({
+// Chave de API lê pastas públicas; Service Account lê pastas compartilhadas com o e-mail dela.
+const client = () => {
+  const { googleApiKey, googleServiceAccountJson } = env();
+  if (googleApiKey) return drive({ version: "v3", auth: googleApiKey });
+  if (!googleServiceAccountJson) {
+    throw new Error("Defina GOOGLE_API_KEY ou GOOGLE_SERVICE_ACCOUNT_JSON.");
+  }
+  return drive({
     version: "v3",
     auth: new auth.GoogleAuth({
-      credentials: parseCredentials(env().googleServiceAccountJson),
+      credentials: parseCredentials(googleServiceAccountJson),
       scopes: ["https://www.googleapis.com/auth/drive.readonly"],
     }),
   });
+};
 
 export const isGoogleDoc = (file: SourceFile) => file.mimeType.startsWith(GOOGLE_APPS);
 
