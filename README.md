@@ -1,61 +1,59 @@
-# Drive para Azure Blob (P2 - Computação em Nuvem II)
+# Drive para Azure Blob
 
-Aplicação Next.js que copia os arquivos de uma pasta do Google Drive para um contêiner do Azure Blob Storage.
+Aplicação da P2 de Computação em Nuvem II. Copia os arquivos de uma pasta do Google Drive para um contêiner do Azure Blob Storage.
 
-- **Origem:** Google Drive, autenticação por chave de API (pasta pública) ou Service Account (`lib/drive.ts`, `listSourceFiles`).
-- **Destino:** Azure Blob Storage, autenticação por BlobSASURL (preferida) ou Connection String, ambas fornecidas no Word da prova (`lib/blob.ts`, `listDestinationBlobs`).
-- **Migração:** `lib/migrate.ts` imprime `[OK]` ou `[ERRO]` no console para cada arquivo; um erro não interrompe os demais.
-- **Interface:** botões "Listar origem (Drive)", "Listar destino (Blob)" e "Migrar", com tabela de status por arquivo.
-- Google Docs, Sheets e Slides são exportados para PDF (ganham `.pdf`). Subpastas são ignoradas.
+- Aplicação publicada: https://drive-to-blob-p2.onrender.com
+- Código: https://github.com/IgorFernandesSantoss/drive-to-blob-p2
+- Contêiner de destino: `aluno-igorfernandes`
 
-URL publicada: https://drive-to-blob-p2.onrender.com (Render, plano gratuito: a primeira requisição após inatividade demora ~1 min).
+## Como funciona
 
-## Situação da entrega
+A página tem três botões:
 
-- **Verificado de verdade:** Azure com a BlobSASURL do enunciado (criar contêiner, enviar, listar, apagar), interface, build, teste, typecheck, lint e container (inclusive build a partir de clone limpo).
-- **Não verificado:** a leitura do Google Drive só passou no typecheck, sem rodar contra uma pasta real.
-- **Instância publicada:** tem só as variáveis do Azure. Sem `GOOGLE_API_KEY` e `GOOGLE_DRIVE_FOLDER_ID`, "Listar destino" funciona e "Listar origem"/"Migrar" respondem qual variável falta. Para ativar, siga a seção abaixo e adicione as duas variáveis no painel do Render.
+- **Listar origem (Drive):** mostra os arquivos da pasta do Google Drive.
+- **Listar destino (Blob):** mostra os arquivos do contêiner no Azure.
+- **Migrar:** copia cada arquivo do Drive para o contêiner e mostra o status (sucesso ou erro) de cada um. O mesmo status aparece no console como `[OK]` ou `[ERRO]`.
 
-## Configuração do Google (uma vez)
+Arquivos do Google (Docs, Sheets, Slides) são salvos como PDF. Subpastas não são copiadas.
 
-**Opção A: pasta pública + chave de API (mais simples)**
+## Código
 
-1. No Google Drive, compartilhe a pasta como "Qualquer pessoa com o link" (Leitor). O ID da pasta é o final da URL (`drive.google.com/drive/folders/<ID>`).
-2. No Google Cloud Console: crie um projeto, ative a **Google Drive API** e em APIs e serviços > Credenciais crie uma **Chave de API** (restrinja à Drive API).
-3. Defina `GOOGLE_API_KEY` e `GOOGLE_DRIVE_FOLDER_ID`.
+- `lib/drive.ts`: lista e baixa os arquivos do Google Drive.
+- `lib/blob.ts`: lista e envia arquivos para o Azure Blob.
+- `lib/migrate.ts`: copia os arquivos e registra o status de cada um.
+- `app/page.tsx`: tela com os botões e a tabela de status.
+- `app/api/*`: rotas que a tela chama.
 
-**Opção B: Service Account (pasta privada)**
+## Configuração
 
-1. Crie uma Service Account com chave JSON (IAM > Contas de serviço) e ative a Drive API.
-2. Compartilhe a pasta como Leitor com o e-mail da Service Account.
-3. Defina `GOOGLE_SERVICE_ACCOUNT_JSON` (JSON ou base64: `base64 -w0 chave.json`) e `GOOGLE_DRIVE_FOLDER_ID`.
+Copie `.env.example` para `.env.local` e preencha:
 
-Se as duas estiverem definidas, a chave de API tem prioridade.
+| Variável | O que é |
+| --- | --- |
+| `AZURE_BLOB_SAS_URL` | BlobSASURL do enunciado (ou use `AZURE_STORAGE_CONNECTION_STRING`) |
+| `AZURE_BLOB_CONTAINER_NAME` | `aluno-igorfernandes` |
+| `GOOGLE_DRIVE_FOLDER_ID` | ID da pasta (final da URL da pasta no Drive) |
+| `GOOGLE_API_KEY` | Chave de API do Google, para pasta compartilhada com "qualquer pessoa com o link" |
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | Alternativa à chave: JSON da Service Account, com a pasta compartilhada com o e-mail dela |
 
-## Rodar local
+Para pegar a chave: no Google Cloud Console, ative a Google Drive API e crie uma Chave de API em Credenciais.
+
+## Rodar
 
 ```bash
-cp .env.example .env.local   # preencher as variáveis (Azure: SAS URL ou Connection String do Word)
 bun install
-bun dev                      # http://localhost:3000
-bun test && bun run typecheck && bun run lint
+bun dev
 ```
 
-O contêiner padrão é `aluno-igorfernandes` (`Aluno_xxx` do enunciado não é um nome válido no Azure; ver `ADR.md`).
+Abra http://localhost:3000. Testes: `bun test`.
 
-## Container
+Com container:
 
 ```bash
-podman build -t p2-drive-blob .
-podman run --rm -p 10000:10000 --env-file .env.local p2-drive-blob
+podman build -t drive-to-blob .
+podman run --rm -p 10000:10000 --env-file .env.local drive-to-blob
 ```
 
-## Publicação (Render)
+## Publicação
 
-New > Web Service > repositório `IgorFernandesSantoss/drive-to-blob-p2` > Runtime **Docker** > defina as variáveis de ambiente (`GOOGLE_API_KEY`, `GOOGLE_DRIVE_FOLDER_ID` e `AZURE_BLOB_SAS_URL`).
-O Render injeta `PORT`; o `Dockerfile` usa 10000 por padrão.
-
-## Segurança
-
-Chave da Service Account e Connection String ficam só em variáveis de ambiente (`.env*` está no `.gitignore`).
-A URL pública não tem login: quem a abrir pode listar e disparar a cópia (idempotente, sobrescreve os mesmos blobs). Para uso real, colocar autenticação na frente.
+Publicado no Render como Web Service com Docker, usando este repositório. As variáveis da tabela acima são configuradas no painel do Render.

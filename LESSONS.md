@@ -28,10 +28,10 @@
 - **Onde:** `lib/drive.ts` (`parseCredentials`).
 - **Solução:** mensagem clara pedindo JSON ou base64.
 
-## 7. Enunciado já traz as credenciais do Azure; só o Google exigia setup
-- **Evidência:** o `gcloud` local só tinha a conta corporativa (sessão expirada), e a prova entrega Connection String e BlobSASURL do Azure.
-- **Onde:** `lib/blob.ts` (SAS URL ou Connection String), `lib/drive.ts` (chave de API ou Service Account).
-- **Solução:** usar as credenciais do Word (SAS testada com criar/enviar/listar/apagar) e permitir chave de API para a pasta pública do Drive, sem criar nada na conta corporativa.
+## 7. Credenciais do Azure já vêm no enunciado
+- **Evidência:** a prova entrega a Connection String e a BlobSASURL.
+- **Onde:** `lib/blob.ts`.
+- **Solução:** o app aceita a SAS URL (preferida, tem validade) ou a Connection String.
 
 ## 8. Build do Docker quebraria no Render: `public/` vazia não vai para o git
 - **Evidência:** `git ls-files public` retornava 0 arquivos; o `Dockerfile` faz `COPY --from=builder /app/public ./public`. O build local passava só porque a pasta vazia existia no disco.
