@@ -3,7 +3,7 @@
 Aplicação Next.js que copia os arquivos de uma pasta do Google Drive para um contêiner do Azure Blob Storage.
 
 - **Origem:** Google Drive, autenticação por Service Account (`lib/drive.ts`, `listSourceFiles`).
-- **Destino:** Azure Blob Storage, autenticação por Connection String (`lib/blob.ts`, `listDestinationBlobs`).
+- **Destino:** Azure Blob Storage, autenticação por BlobSASURL (preferida) ou Connection String, ambas fornecidas no Word da prova (`lib/blob.ts`, `listDestinationBlobs`).
 - **Migração:** `lib/migrate.ts` imprime `[OK]` ou `[ERRO]` no console para cada arquivo; um erro não interrompe os demais.
 - **Interface:** botões "Listar origem (Drive)", "Listar destino (Blob)" e "Migrar", com tabela de status por arquivo.
 - Google Docs, Sheets e Slides são exportados para PDF (ganham `.pdf`). Subpastas são ignoradas.
@@ -30,7 +30,7 @@ gcloud iam service-accounts keys create ~/p2-key.json \
 ## Rodar local
 
 ```bash
-cp .env.example .env.local   # preencher as 4 variáveis
+cp .env.example .env.local   # preencher as variáveis (Azure: SAS URL ou Connection String do Word)
 bun install
 bun dev                      # http://localhost:3000
 bun test && bun run typecheck && bun run lint
@@ -48,7 +48,7 @@ podman run --rm -p 10000:10000 --env-file .env.local p2-drive-blob
 
 ## Publicação (Render)
 
-New > Web Service > repositório `IgorFernandesSantoss/drive-to-blob-p2` > Runtime **Docker** > defina as 4 variáveis de ambiente.
+New > Web Service > repositório `IgorFernandesSantoss/drive-to-blob-p2` > Runtime **Docker** > defina as variáveis de ambiente (`GOOGLE_*` e `AZURE_BLOB_SAS_URL`).
 O Render injeta `PORT`; o `Dockerfile` usa 10000 por padrão.
 
 ## Segurança

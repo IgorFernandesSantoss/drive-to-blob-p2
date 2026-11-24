@@ -3,10 +3,15 @@ import { BlobServiceClient } from "@azure/storage-blob";
 import { env } from "@/lib/env";
 import type { DestinationBlob } from "@/lib/types";
 
+const service = () => {
+  const { azureSasUrl, storageConnectionString } = env();
+  if (azureSasUrl) return new BlobServiceClient(azureSasUrl);
+  if (storageConnectionString) return BlobServiceClient.fromConnectionString(storageConnectionString);
+  throw new Error("Defina AZURE_BLOB_SAS_URL ou AZURE_STORAGE_CONNECTION_STRING.");
+};
+
 const container = async () => {
-  const c = BlobServiceClient.fromConnectionString(
-    env().storageConnectionString,
-  ).getContainerClient(env().blobContainerName);
+  const c = service().getContainerClient(env().blobContainerName);
   await c.createIfNotExists();
   return c;
 };

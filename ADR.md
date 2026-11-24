@@ -7,7 +7,7 @@
 
 ## ADR-002: Autenticação
 - **Google:** Service Account com escopo `drive.readonly`; a pasta é compartilhada com o e-mail dela. Sem OAuth de usuário, sem senha. A chave vem de `GOOGLE_SERVICE_ACCOUNT_JSON` (JSON ou base64).
-- **Azure:** Connection String do enunciado em `AZURE_STORAGE_CONNECTION_STRING`.
+- **Azure:** BlobSASURL do enunciado em `AZURE_BLOB_SAS_URL` (preferida: SAS tem validade e permissões limitadas, não expõe a chave da conta) ou Connection String em `AZURE_STORAGE_CONNECTION_STRING`. Testado com a SAS: criar contêiner, enviar, listar e apagar funcionam.
 - **Segredos:** só em variáveis de ambiente; nunca no git nem no zip.
 
 ## ADR-003: Nome do contêiner `aluno-igorfernandes`
