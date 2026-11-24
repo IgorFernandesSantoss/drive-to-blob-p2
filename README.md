@@ -8,7 +8,7 @@ Aplicação Next.js que copia os arquivos de uma pasta do Google Drive para um c
 - **Interface:** botões "Listar origem (Drive)", "Listar destino (Blob)" e "Migrar", com tabela de status por arquivo.
 - Google Docs, Sheets e Slides são exportados para PDF (ganham `.pdf`). Subpastas são ignoradas.
 
-URL publicada: _preencher após o deploy no Render_ (ver seção Publicação).
+URL publicada: https://drive-to-blob-p2.onrender.com (Render, plano gratuito: a primeira requisição após inatividade demora ~1 min).
 
 ## Configuração do Google (uma vez)
 
